@@ -27,7 +27,7 @@ class Course:
 def bucket_register(students,possible_courses):
     for student in students:
         #first iterate through all students and update their most desired class
-        most_desired = student.desired[0]
+        most_desired = student.reported[0]
         most_desired.students_who_want.append(student)
     #now index all possible classes,
     for course in possible_courses:
@@ -55,13 +55,13 @@ def student_register(students,possible_courses):
         index = 0
        # print(student.name,"wants",student.desired[0].name," ",student.desired[1].name)
         registered = False
-        while(index<len(student.desired) and not registered):
+        while(index<len(student.reported) and not registered):
             #if there is a seat available put the student in it
-            if(len(student.desired[index].registered)<student.desired[index].capacity):
-                student.registered.append(student.desired[index])
-                student.desired[index].registered.append(student)
+            if(len(student.reported[index].registered)<student.reported[index].capacity):
+                student.registered.append(student.reported[index])
+                student.reported[index].registered.append(student)
                 registered = True
-                #print(student.name,"got",student.desired[index].name,"as their ",index,"choice")
+                #print(student.name,"got",student.reported[index].name,"as their ",index,"choice")
             #if there is not a seat available we just keep the loop
             index+=1
     #now we look at the students and see how many got what they wanted
