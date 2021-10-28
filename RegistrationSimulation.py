@@ -2,6 +2,7 @@ import random
 import copy
 #this is an extremely simple simulation which implements bucket vs student-by-student class selection
 
+#these are dummy students used for the simulation, will be replaced by the database
 class Student:
     name = ""
     desired = []
@@ -12,7 +13,7 @@ class Student:
         self.reported = desired.copy()
         self.registered = []
         self.name = name
-
+#these are dummy Courses used for the simulation, will be replaced by the database
 class Course:
     name = ""
     capacity = 3
@@ -47,6 +48,18 @@ def bucket_register(students,possible_courses):
     #now we look at the students and see how many got what they wanted
     for student in students:
         print(student.name,"wanted",student.desired[0].name,"and got",student.registered[0].name if (len(student.registered)>0) else "nothing")
+#For the sake of the simulation, prereqs and timing are ignored
+def ClassIsOpen(student,course):
+    #Check that class has a seat open
+    if not (len(course.registered)<course.capacity):
+        return False
+    #Check that class time does not overlap with current student schedule
+        #If not, return False
+    #Check that student is eligible for class
+        #For each restriction of class (social class, major, prereqs, instructor permission), check the appropriate student data.
+        #If any fails, return False
+    #IGNORING CO-REQS FOR RELEASE 1
+    return True
 
 def student_register(students,possible_courses):
     #we index the list of students first
@@ -57,43 +70,50 @@ def student_register(students,possible_courses):
         registered = False
         while(index<len(student.reported) and not registered):
             #if there is a seat available put the student in it
-            if(len(student.reported[index].registered)<student.reported[index].capacity):
+            if(len(student.reported[index].registered)<student.reported[index].capacity and student.reported[index] not in student.registered):
                 student.registered.append(student.reported[index])
                 student.reported[index].registered.append(student)
                 registered = True
                 #print(student.name,"got",student.reported[index].name,"as their ",index,"choice")
             #if there is not a seat available we just keep the loop
             index+=1
+        #print(student.name," got nothing")
     #now we look at the students and see how many got what they wanted
     for student in students:
-        print(student.name,"wanted",student.desired[0].name,"and got",student.registered[0].name if (len(student.registered)>0) else "nothing")
+        wanted = []
+        for report in student.reported:
+            wanted.append(report.name)
+        and_got = []
+        for register in student.registered:
+            and_got.append(register.name)
+        print(student.name,"wanted",wanted,"and got",and_got)
 
 #we create 13 Courses
-bucket_possible_courses = []
 possible_courses = []
-for i in range(0,2):
-    bucket_possible_courses.append(Course("course"+str(i)))
-    possible_courses.append(Course("course"+str(i)))
+for i in [301,303,304,312]:
+    possible_courses.append(Course("CSCI"+str(i)))
 
 #we create 30 students
 students=[]
 bucket_students = []
-for i in range(0,5):
+for i in ["Andrew","Jeannine","Robert","Peter"]:
     #each student desires the classes in a random order
-    wanted = (bucket_possible_courses).copy()
+    wanted = (possible_courses).copy()
     random.shuffle(wanted)
-    new_student = Student(wanted,"Student"+str(i))
+    new_student = Student(wanted,str(i))
     students.append(new_student)
     bucket_student = Student(wanted.copy(),"Student"+str(i))
     bucket_students.append(bucket_student)
-#call the bucket registration process
-bucket_register(bucket_students,bucket_possible_courses)
-print("-----")
+
 #clean out all of the courses
-for course in bucket_possible_courses:
+for course in possible_courses:
     course.registered = []
     course.students_who_want = []
-student_register(students,possible_courses)
+
+for i in range(1,4):
+    print("-----ROUND "+str(i)+"-----")
+    student_register(students,possible_courses)
+    random.shuffle(students)
 
         
     
